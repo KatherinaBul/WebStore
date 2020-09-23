@@ -15,7 +15,7 @@ namespace WebStore.Clients.Values
 
         public IEnumerable<string> Get()
         {
-            var response = _Client.GetAsync(_ServiceAddress).Result;
+            var response = Client.GetAsync(ServiceAddress).Result;
             if (response.IsSuccessStatusCode)
                 return response.Content.ReadAsAsync<IEnumerable<string>>().Result;
 
@@ -24,7 +24,7 @@ namespace WebStore.Clients.Values
 
         public string Get(int id)
         {
-            var response = _Client.GetAsync($"{_ServiceAddress}/{id}").Result;
+            var response = Client.GetAsync($"{ServiceAddress}/{id}").Result;
             if (response.IsSuccessStatusCode)
                 return response.Content.ReadAsAsync<string>().Result;
 
@@ -33,19 +33,19 @@ namespace WebStore.Clients.Values
 
         public Uri Post(string value)
         {
-            var response = _Client.PostAsJsonAsync(_ServiceAddress, value).Result;
+            var response = Client.PostAsJsonAsync(ServiceAddress, value).Result;
             return response.EnsureSuccessStatusCode().Headers.Location;
         }
 
         public HttpStatusCode Update(int id, string value)
         {
-            var response = _Client.PutAsJsonAsync($"{_ServiceAddress}/{id}", value).Result;
+            var response = Client.PutAsJsonAsync($"{ServiceAddress}/{id}", value).Result;
             return response.EnsureSuccessStatusCode().StatusCode;
         }
 
         public HttpStatusCode Delete(int id)
         {
-            var response = _Client.DeleteAsync($"{_ServiceAddress}/{id}").Result;
+            var response = Client.DeleteAsync($"{ServiceAddress}/{id}").Result;
             return response.StatusCode;
         }
     }
