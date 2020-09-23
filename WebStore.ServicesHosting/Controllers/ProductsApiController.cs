@@ -21,10 +21,10 @@ namespace WebStore.ServicesHosting.Controllers
         [HttpGet("brands")]
         public IEnumerable<BrandDto> GetBrands() => _productData.GetBrands();
 
-        [HttpPost("products")]
+        [HttpPost]
         public IEnumerable<ProductDto> GetProducts(ProductFilter filter = null) => _productData.GetProducts(filter);
 
-        [HttpGet("products/{id:int}")]
+        [HttpGet("{id:int}")]
         public ProductDto GetProductById(int id) => _productData.GetProductById(id);
     }
 }
