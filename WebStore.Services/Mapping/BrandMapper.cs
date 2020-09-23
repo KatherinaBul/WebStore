@@ -1,4 +1,6 @@
-﻿using WebStore.Domain.Dto;
+﻿using System.Collections.Generic;
+using System.Linq;
+using WebStore.Domain.Dto;
 using WebStore.Domain.Entities;
 
 namespace WebStore.Services.Mapping
@@ -11,10 +13,14 @@ namespace WebStore.Services.Mapping
             Name = p.Name
         };
         
+        public static IEnumerable<BrandDto> ToDto(this IEnumerable<Brand> brands) => brands.Select(ToDto);
+
         public static Brand FromDto(this BrandDto p) => new Brand()
         {
             Id = p.Id,
             Name = p.Name
         };
+        
+        public static IEnumerable<Brand> FromDto(this IEnumerable<BrandDto> brands) => brands.Select(FromDto);
     }
 }
