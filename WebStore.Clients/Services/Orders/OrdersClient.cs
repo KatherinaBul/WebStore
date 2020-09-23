@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using WebStore.Clients.Base;
+using WebStore.Domain;
 using WebStore.Domain.Dto.Order;
 using WebStore.Interfaces.Services;
 
@@ -10,7 +11,7 @@ namespace WebStore.Clients.Services.Orders
 {
     public class OrdersClient : BaseClient, IOrderService
     {
-        public OrdersClient(IConfiguration configuration) : base(configuration, "api/orders")
+        public OrdersClient(IConfiguration configuration) : base(configuration, WebApi.Orders)
         {
         }
 

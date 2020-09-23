@@ -7,7 +7,7 @@ using WebStore.Interfaces.Services;
 namespace WebStore.ServicesHosting.Controllers
 {
     [Produces("application/json")]
-    [Route("api/products")]
+    [Route(WebApi.Products)]
     [ApiController]
     public class ProductsApiController : Controller, IProductData
     {

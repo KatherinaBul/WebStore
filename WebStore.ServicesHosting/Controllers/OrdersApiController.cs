@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using WebStore.Domain;
 using WebStore.Domain.Dto.Order;
 using WebStore.Interfaces.Services;
 
 namespace WebStore.ServicesHosting.Controllers
 {
     [Produces("application/json")]
-    [Route("api/orders")]
+    [Route(WebApi.Orders)]
     [ApiController]
     public class OrdersApiController : Controller, IOrderService
     {

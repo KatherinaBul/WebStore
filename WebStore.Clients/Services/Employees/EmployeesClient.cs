@@ -2,6 +2,7 @@
 using System.Net.Http;
 using Microsoft.Extensions.Configuration;
 using WebStore.Clients.Base;
+using WebStore.Domain;
 using WebStore.Domain.Entities;
 using WebStore.Domain.ViewModels;
 using WebStore.Interfaces.Services;
@@ -10,7 +11,7 @@ namespace WebStore.Clients.Services.Employees
 {
     public class EmployeesClient : BaseClient, IEmployeesData
     {
-        public EmployeesClient(IConfiguration configuration) : base(configuration, "api/employees")
+        public EmployeesClient(IConfiguration configuration) : base(configuration, WebApi.Employees)
         {
         }
 
