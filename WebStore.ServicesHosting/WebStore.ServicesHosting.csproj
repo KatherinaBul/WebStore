@@ -4,5 +4,16 @@
         <TargetFramework>netcoreapp3.1</TargetFramework>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\WebStore.DAL\WebStore.DAL.csproj" />
+      <ProjectReference Include="..\WebStore.Domain\WebStore.Domain.csproj" />
+      <ProjectReference Include="..\WebStore.Interfaces\WebStore.Interfaces.csproj" />
+      <ProjectReference Include="..\WebStore.Services\WebStore.Services.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.8" />
+    </ItemGroup>
+
 
 </Project>
