@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 
 namespace WebStore.Clients.Base
 {
-    public abstract class BaseClient: IDisposable
+    public abstract class BaseClient : IDisposable
     {
         protected string ServiceAddress;
         protected HttpClient Client;
@@ -27,36 +28,36 @@ namespace WebStore.Clients.Base
 
         protected T Get<T>(string url) => GetAsync<T>(url).Result;
 
-        protected async Task<T> GetAsync<T>(string url)
+        protected async Task<T> GetAsync<T>(string url, CancellationToken token = default)
         {
-            var response = await Client.GetAsync(url);
+            var response = await Client.GetAsync(url, token);
             return await response
                 .EnsureSuccessStatusCode() // Убеждаемся, что в ответ получен 200-ый статусный код.
                 .Content // В ответе есть содержимое с которым можно работать
-                .ReadAsAsync<T>(); // Десериализуем данные в нужный тип объекта
+                .ReadAsAsync<T>(token); // Десериализуем данные в нужный тип объекта
         }
 
         protected HttpResponseMessage Post<T>(string url, T item) => PostAsync<T>(url, item).Result;
 
-        protected async Task<HttpResponseMessage> PostAsync<T>(string url, T item)
+        protected async Task<HttpResponseMessage> PostAsync<T>(string url, T item, CancellationToken token = default)
         {
-            var response = await Client.PostAsJsonAsync(url, item);
+            var response = await Client.PostAsJsonAsync(url, item, token);
             return response.EnsureSuccessStatusCode();
         }
 
         protected HttpResponseMessage Put<T>(string url, T item) => PutAsync<T>(url, item).Result;
 
-        protected async Task<HttpResponseMessage> PutAsync<T>(string url, T item)
+        protected async Task<HttpResponseMessage> PutAsync<T>(string url, T item, CancellationToken token = default)
         {
-            var response = await Client.PutAsJsonAsync(url, item);
+            var response = await Client.PutAsJsonAsync(url, item, token);
             return response.EnsureSuccessStatusCode();
         }
 
         protected HttpResponseMessage Delete(string url) => DeleteAsync(url).Result;
 
-        protected async Task<HttpResponseMessage> DeleteAsync(string url)
+        protected async Task<HttpResponseMessage> DeleteAsync(string url, CancellationToken token = default)
         {
-            var response = await Client.DeleteAsync(url);
+            var response = await Client.DeleteAsync(url, token);
             return response.EnsureSuccessStatusCode();
         }
 
