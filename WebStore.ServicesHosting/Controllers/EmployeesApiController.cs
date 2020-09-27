@@ -15,12 +15,26 @@ namespace WebStore.ServicesHosting.Controllers
 
         public EmployeesApiController(IEmployeesData employeesData) => _employeesData = employeesData;
 
+        /// <summary>
+        /// Получить всех сотрудников
+        /// </summary>
+        /// <returns>Список сотрудников</returns>
         [HttpGet]
         public IEnumerable<Employee> Get() => _employeesData.Get();
 
+        /// <summary>
+        /// Получить сотрудника по идентификатору
+        /// </summary>
+        /// <param name="id">Индентификатор сотрудника</param>
+        /// <returns>Информация о сотруднике</returns>
         [HttpGet("{id:int}")]
         public Employee GetById(int id) => _employeesData.GetById(id);
 
+        /// <summary>
+        /// Добавить нового сотрудника
+        /// </summary>
+        /// <param name="employee">Информация о сотруднике</param>
+        /// <returns>Идентификатор нового сотрудника</returns>
         [HttpPost]
         public int Add(Employee employee)
         {
@@ -29,6 +43,10 @@ namespace WebStore.ServicesHosting.Controllers
             return id;
         }
 
+        /// <summary>
+        /// Обновить информацию о сотруднике
+        /// </summary>
+        /// <param name="employee">Обновленная информация о сотруднике</param>
         [HttpPut]
         public void Edit(Employee employee)
         {
@@ -36,6 +54,11 @@ namespace WebStore.ServicesHosting.Controllers
             SaveChanges();
         }
 
+        /// <summary>
+        /// Удалить сотрудника
+        /// </summary>
+        /// <param name="id">Идентификатор сотрудника</param>
+        /// <returns>Результат удаления</returns>
         [HttpDelete("{id:int}")]
         public bool Delete(int id)
         {

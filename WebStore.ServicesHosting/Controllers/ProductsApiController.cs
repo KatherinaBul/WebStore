@@ -15,15 +15,33 @@ namespace WebStore.ServicesHosting.Controllers
 
         public ProductsApiController(IProductData productData) => _productData = productData;
 
+        /// <summary>
+        /// Получить категории товаров
+        /// </summary>
+        /// <returns>Список категорий товаров</returns>
         [HttpGet("sections")]
         public IEnumerable<SectionDto> GetSections() => _productData.GetSections();
 
+        /// <summary>
+        /// Получить список брендов
+        /// </summary>
+        /// <returns>Список брендов</returns>
         [HttpGet("brands")]
         public IEnumerable<BrandDto> GetBrands() => _productData.GetBrands();
 
+        /// <summary>
+        /// Получить товары в соответствии с фильтром
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns>Список товаров</returns>
         [HttpPost]
         public IEnumerable<ProductDto> GetProducts(ProductFilter filter = null) => _productData.GetProducts(filter);
 
+        /// <summary>
+        /// Получить информацию о товаре по его идентифиакатору
+        /// </summary>
+        /// <param name="id">Идентификатор товара</param>
+        /// <returns>Информация о товаре</returns>
         [HttpGet("{id:int}")]
         public ProductDto GetProductById(int id) => _productData.GetProductById(id);
     }
