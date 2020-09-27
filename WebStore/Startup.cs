@@ -77,18 +77,13 @@ namespace WebStore
                 opt.SlidingExpiration = true;
             });
 
-            services.AddControllersWithViews(opt =>
-            {
-                //opt.Filters.Add<Filter>();
-                //opt.Conventions.Add(); // Добавление/изменение соглашений MVC-приложения
-            }).AddRazorRuntimeCompilation();
+            services.AddControllersWithViews().AddRazorRuntimeCompilation();
 
             services.AddScoped<IEmployeesData, EmployeesClient>();
             services.AddScoped<IProductData, ProductsClient>();
             services.AddScoped<ICartService, CookiesCartService>();
             services.AddScoped<IOrderService, OrdersClient>();
 
-            // Добавляем реализацию клиента
             services.AddScoped<IValueService, ValueClient>();
 
         }
