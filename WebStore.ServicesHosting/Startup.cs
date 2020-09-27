@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -69,6 +70,18 @@ namespace WebStore.ServicesHosting
             services.AddSwaggerGen(opt =>
             {
                 opt.SwaggerDoc("v1", new OpenApiInfo { Title = "WebStore.API", Version = "v1" });
+
+                const string webDomainXml = "WebStore.Domain.xml";
+                const string webApiXml = "WebStore.ServicesHosting.xml";
+                const string debugPath = "bin/debug/netcoreapp3.1";
+
+                opt.IncludeXmlComments(webApiXml);
+
+                if(File.Exists(webDomainXml))
+                    opt.IncludeXmlComments(webDomainXml);
+                else if(File.Exists(Path.Combine(debugPath, webDomainXml)))
+                    opt.IncludeXmlComments(Path.Combine(debugPath, webDomainXml));
+
             });
             
             services.AddControllers();

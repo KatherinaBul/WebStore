@@ -4,6 +4,11 @@
         <TargetFramework>netcoreapp3.1</TargetFramework>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <NoWarn>1701;1702;1591</NoWarn>
+      <DocumentationFile>WebStore.ServicesHosting.xml</DocumentationFile>
+    </PropertyGroup>
+
     <ItemGroup>
       <ProjectReference Include="..\WebStore.DAL\WebStore.DAL.csproj" />
       <ProjectReference Include="..\WebStore.Domain\WebStore.Domain.csproj" />
