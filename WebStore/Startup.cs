@@ -7,6 +7,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using WebStore.Clients.Services.Employees;
+using WebStore.Clients.Services.Orders;
+using WebStore.Clients.Services.Products;
 using WebStore.Clients.Values;
 using WebStore.DAL.Context;
 using WebStore.Domain.Entities.Identity;
@@ -14,7 +17,6 @@ using WebStore.Interfaces.Api;
 using WebStore.Interfaces.Services;
 using WebStore.Services.Data;
 using WebStore.Services.Products.InCookies;
-using WebStore.Services.Products.InSQL;
 
 namespace WebStore
 {
@@ -72,10 +74,10 @@ namespace WebStore
                 //opt.Conventions.Add(); // Добавление/изменение соглашений MVC-приложения
             }).AddRazorRuntimeCompilation();
 
-            services.AddScoped<IEmployeesData, SqlEmployeesData>();
-            services.AddScoped<IProductData, SqlProductData>();
+            services.AddScoped<IEmployeesData, EmployeesClient>();
+            services.AddScoped<IProductData, ProductsClient>();
             services.AddScoped<ICartService, CookiesCartService>();
-            services.AddScoped<IOrderService, SqlOrderService>();
+            services.AddScoped<IOrderService, OrdersClient>();
 
             // Добавляем реализацию клиента
             services.AddScoped<IValueService, ValueClient>();

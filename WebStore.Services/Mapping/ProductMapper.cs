@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using WebStore.Domain.Dto;
 using WebStore.Domain.Entities;
 using WebStore.Domain.ViewModels;
 
@@ -17,6 +18,31 @@ namespace WebStore.Services.Mapping
             Brand = p.Brand?.Name
         };
 
-        public static IEnumerable<ProductViewModel> ToView(this IEnumerable<Product> products) => products.Select(ToView);
+        public static IEnumerable<ProductViewModel> ToView(this IEnumerable<Product> products) =>
+            products.Select(ToView);
+
+        public static ProductDto ToDto(this Product p) => new ProductDto()
+        {
+            Id = p.Id,
+            Name = p.Name,
+            Order = p.Order,
+            Price = p.Price,
+            ImageUrl = p.ImageUrl,
+            Brand = p.Brand.ToDto()
+        };
+
+        public static IEnumerable<ProductDto> ToDto(this IEnumerable<Product> products) => products.Select(ToDto);
+
+        public static Product FromDto(this ProductDto p) => new Product()
+        {
+            Id = p.Id,
+            Name = p.Name,
+            Order = p.Order,
+            Price = p.Price,
+            ImageUrl = p.ImageUrl,
+            Brand = p.Brand.FromDto()
+        };
+
+        public static IEnumerable<Product> FromDto(this IEnumerable<ProductDto> products) => products.Select(FromDto);
     }
 }
