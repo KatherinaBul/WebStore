@@ -3,19 +3,17 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using WebStore.Clients.Identity;
 using WebStore.Clients.Services.Employees;
 using WebStore.Clients.Services.Orders;
 using WebStore.Clients.Services.Products;
 using WebStore.Clients.Values;
-using WebStore.DAL.Context;
 using WebStore.Domain.Entities.Identity;
 using WebStore.Interfaces.Api;
 using WebStore.Interfaces.Services;
-using WebStore.Services.Data;
 using WebStore.Services.Products.InCookies;
 
 namespace WebStore
@@ -28,14 +26,25 @@ namespace WebStore
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<WebStoreDB>(opt => 
-                opt.UseSqlServer(_Configuration.GetConnectionString("DefaultConnection")));
-            services.AddTransient<WebStoreDBInitializer>();
-
             services.AddIdentity<User, Role>(opt => {  })
-               .AddEntityFrameworkStores<WebStoreDB>()
                .AddDefaultTokenProviders();
 
+            #region WebAPI Identity clients stores
+
+            services
+                .AddTransient<IUserStore<User>, UsersClient>()
+                .AddTransient<IUserPasswordStore<User>, UsersClient>()
+                .AddTransient<IUserEmailStore<User>, UsersClient>()
+                .AddTransient<IUserPhoneNumberStore<User>, UsersClient>()
+                .AddTransient<IUserTwoFactorStore<User>, UsersClient>()
+                .AddTransient<IUserClaimStore<User>, UsersClient>()
+                .AddTransient<IUserLoginStore<User>, UsersClient>();
+            services
+                .AddTransient<IRoleStore<Role>, RolesClient>(); 
+
+            #endregion
+
+            
             services.Configure<IdentityOptions>(opt =>
             {
 #if DEBUG
@@ -84,10 +93,8 @@ namespace WebStore
 
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, WebStoreDBInitializer db)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-           db.Initialize();
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -103,15 +110,6 @@ namespace WebStore
             app.UseAuthorization();
 
             app.UseWelcomePage("/welcome");
-
-            //app.Use(async (context, next) =>
-            //{
-            //    //Действия над context до следующего элемента в конвейере
-            //    await next(); // Вызов следующего промежуточного ПО в конвейере
-            //    // Действия над context после следующего элемента в конвейере
-            //});
-
-            //app.UseMiddleware<TestMiddleware>();
 
             app.UseEndpoints(endpoints =>
             {
