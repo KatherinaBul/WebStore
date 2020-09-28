@@ -4,6 +4,11 @@
         <TargetFramework>netcoreapp3.1</TargetFramework>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <NoWarn>1701;1702;1591</NoWarn>
+      <DocumentationFile>WebStore.ServicesHosting.xml</DocumentationFile>
+    </PropertyGroup>
+
     <ItemGroup>
       <ProjectReference Include="..\WebStore.DAL\WebStore.DAL.csproj" />
       <ProjectReference Include="..\WebStore.Domain\WebStore.Domain.csproj" />
@@ -13,6 +18,7 @@
 
     <ItemGroup>
       <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.8" />
+      <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
     </ItemGroup>
 
 

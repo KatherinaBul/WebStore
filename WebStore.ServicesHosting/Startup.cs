@@ -1,20 +1,18 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 using WebStore.DAL.Context;
 using WebStore.Domain.Entities.Identity;
 using WebStore.Interfaces.Services;
+using WebStore.Services.Data;
 using WebStore.Services.Products.InCookies;
 using WebStore.Services.Products.InSQL;
 
@@ -35,6 +33,7 @@ namespace WebStore.ServicesHosting
             // Добавляем EF Core
             services.AddDbContext<WebStoreDB>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddTransient<WebStoreDBInitializer>();
            
             services.AddIdentity<User, Role>(opt => { })
                 .AddEntityFrameworkStores<WebStoreDB>()
@@ -68,16 +67,42 @@ namespace WebStore.ServicesHosting
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<ICartService, CookiesCartService>();
             
+            services.AddSwaggerGen(opt =>
+            {
+                opt.SwaggerDoc("v1", new OpenApiInfo { Title = "WebStore.API", Version = "v1" });
+
+                const string webDomainXml = "WebStore.Domain.xml";
+                const string webApiXml = "WebStore.ServicesHosting.xml";
+                const string debugPath = "bin/debug/netcoreapp3.1";
+
+                opt.IncludeXmlComments(webApiXml);
+
+                if(File.Exists(webDomainXml))
+                    opt.IncludeXmlComments(webDomainXml);
+                else if(File.Exists(Path.Combine(debugPath, webDomainXml)))
+                    opt.IncludeXmlComments(Path.Combine(debugPath, webDomainXml));
+
+            });
+            
             services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, WebStoreDBInitializer db)
         {
+            db.Initialize();
+            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
+            
+            app.UseSwagger();
+            app.UseSwaggerUI(opt =>
+            {
+                opt.SwaggerEndpoint("/swagger/v1/swagger.json", "WebStore.API");
+                opt.RoutePrefix = string.Empty;
+            });
 
             app.UseRouting();
 
