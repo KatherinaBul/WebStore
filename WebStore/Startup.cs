@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using WebStore.Clients.Identity;
 using WebStore.Clients.Services.Employees;
 using WebStore.Clients.Services.Orders;
@@ -15,6 +16,7 @@ using WebStore.Domain.Entities.Identity;
 using WebStore.Interfaces.Api;
 using WebStore.Interfaces.Services;
 using WebStore.Services.Products.InCookies;
+using WebStore.Logger;
 
 namespace WebStore
 {
@@ -88,8 +90,10 @@ namespace WebStore
 
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory log)
         {
+            log.AddLog4Net();
+            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

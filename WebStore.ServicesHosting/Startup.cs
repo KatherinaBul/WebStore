@@ -8,10 +8,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using WebStore.DAL.Context;
 using WebStore.Domain.Entities.Identity;
 using WebStore.Interfaces.Services;
+using WebStore.Logger;
 using WebStore.Services.Data;
 using WebStore.Services.Products.InCookies;
 using WebStore.Services.Products.InSQL;
@@ -34,7 +36,7 @@ namespace WebStore.ServicesHosting
             services.AddDbContext<WebStoreDB>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddTransient<WebStoreDBInitializer>();
-           
+
             services.AddIdentity<User, Role>(opt => { })
                 .AddEntityFrameworkStores<WebStoreDB>()
                 .AddDefaultTokenProviders();
@@ -57,7 +59,7 @@ namespace WebStore.ServicesHosting
                 opt.Lockout.MaxFailedAccessAttempts = 10;
                 opt.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
             });
-            
+
             // Добавляем разрешение зависимостей
             services.AddScoped<IEmployeesData, SqlEmployeesData>();
             services.AddScoped<IProductData, SqlProductData>();
@@ -66,10 +68,10 @@ namespace WebStore.ServicesHosting
             // Настройки для корзины
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<ICartService, CookiesCartService>();
-            
+
             services.AddSwaggerGen(opt =>
             {
-                opt.SwaggerDoc("v1", new OpenApiInfo { Title = "WebStore.API", Version = "v1" });
+                opt.SwaggerDoc("v1", new OpenApiInfo {Title = "WebStore.API", Version = "v1"});
 
                 const string webDomainXml = "WebStore.Domain.xml";
                 const string webApiXml = "WebStore.ServicesHosting.xml";
@@ -77,26 +79,28 @@ namespace WebStore.ServicesHosting
 
                 opt.IncludeXmlComments(webApiXml);
 
-                if(File.Exists(webDomainXml))
+                if (File.Exists(webDomainXml))
                     opt.IncludeXmlComments(webDomainXml);
-                else if(File.Exists(Path.Combine(debugPath, webDomainXml)))
+                else if (File.Exists(Path.Combine(debugPath, webDomainXml)))
                     opt.IncludeXmlComments(Path.Combine(debugPath, webDomainXml));
-
             });
-            
+
             services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, WebStoreDBInitializer db)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, WebStoreDBInitializer db,
+            ILoggerFactory log)
         {
+            log.AddLog4Net();
+
             db.Initialize();
-            
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
-            
+
             app.UseSwagger();
             app.UseSwaggerUI(opt =>
             {
