@@ -31,36 +31,39 @@ namespace WebStore.Controllers
         public async Task<IActionResult> Register(RegisterUserViewModel model)
         {
             if (!ModelState.IsValid) return View(model);
-
-            _logger.LogInformation("Начало процесса регистрации нового пользователя {0}", model.UserName);
-
-            var user = new User
+            
+            using (_logger.BeginScope("Регистрация пользователя {0}", model.UserName))
             {
-                UserName = model.UserName
-            };
+                _logger.LogInformation("Начало процесса регистрации нового пользователя {0}", model.UserName);
 
-            var registrationResult = await _userManager.CreateAsync(user, model.Password);
-            if (registrationResult.Succeeded)
-            {
-                _logger.LogInformation("Пользователь {0} успешно зарегистрирован", user.UserName);
+                var user = new User
+                {
+                    UserName = model.UserName
+                };
 
-                await _userManager.AddToRoleAsync(user, Role.User);
+                var registrationResult = await _userManager.CreateAsync(user, model.Password);
+                if (registrationResult.Succeeded)
+                {
+                    _logger.LogInformation("Пользователь {0} успешно зарегистрирован", user.UserName);
 
-                _logger.LogInformation("Пользователь {0} наделён ролью {1}", user.UserName, Role.User);
+                    await _userManager.AddToRoleAsync(user, Role.User);
 
-                await _signInManager.SignInAsync(user, false);
-                _logger.LogInformation("Пользователь {0} автоматически вошёл в систему после регистрации",
-                    user.UserName);
+                    _logger.LogInformation("Пользователь {0} наделён ролью {1}", user.UserName, Role.User);
 
-                return RedirectToAction("Index", "Home");
+                    await _signInManager.SignInAsync(user, false);
+                    _logger.LogInformation("Пользователь {0} автоматически вошёл в систему после регистрации",
+                        user.UserName);
+
+                    return RedirectToAction("Index", "Home");
+                }
+
+                _logger.LogWarning("Ошибка при регистрации нового пользователя {0}\r\n",
+                    model.UserName,
+                    string.Join(Environment.NewLine, registrationResult.Errors.Select(error => error.Description)));
+
+                foreach (var error in registrationResult.Errors)
+                    ModelState.AddModelError(string.Empty, error.Description);
             }
-
-            _logger.LogWarning("Ошибка при регистрации нового пользователя {0}\r\n",
-                model.UserName,
-                string.Join(Environment.NewLine, registrationResult.Errors.Select(error => error.Description)));
-
-            foreach (var error in registrationResult.Errors)
-                ModelState.AddModelError(string.Empty, error.Description);
 
             return View(model);
         }
@@ -106,9 +109,9 @@ namespace WebStore.Controllers
         {
             var userName = User.Identity.Name;
             await _signInManager.SignOutAsync();
-            
+
             _logger.LogInformation("Пользователь {0} вышел из системы", userName);
-            
+
             return RedirectToAction("Index", "Home");
         }
 
