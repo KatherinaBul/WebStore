@@ -1,21 +1,26 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using WebStore.Domain.Entities.Identity;
-using WebStore.Domain.ViewModels.Identity;
 using WebStore.Domain.ViewModels.Identity;
 
 namespace WebStore.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly UserManager<User> _UserManager;
-        private readonly SignInManager<User> _SignInManager;
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
+        private readonly ILogger<AccountController> _logger;
 
-        public AccountController(UserManager<User> UserManager, SignInManager<User> SignInManager)
+        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager,
+            ILogger<AccountController> logger)
         {
-            _UserManager = UserManager;
-            _SignInManager = SignInManager;
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _logger = logger;
         }
 
         #region Процесс регистрации нового пользвоателя
@@ -23,64 +28,87 @@ namespace WebStore.Controllers
         public IActionResult Register() => View(new RegisterUserViewModel());
 
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(RegisterUserViewModel Model)
+        public async Task<IActionResult> Register(RegisterUserViewModel model)
         {
-            if (!ModelState.IsValid) return View(Model);
+            if (!ModelState.IsValid) return View(model);
+
+            _logger.LogInformation("Начало процесса регистрации нового пользователя {0}", model.UserName);
 
             var user = new User
             {
-                UserName = Model.UserName
+                UserName = model.UserName
             };
 
-            var registration_result = await _UserManager.CreateAsync(user, Model.Password);
-            if (registration_result.Succeeded)
+            var registrationResult = await _userManager.CreateAsync(user, model.Password);
+            if (registrationResult.Succeeded)
             {
-                await _UserManager.AddToRoleAsync(user, Role.User);
+                _logger.LogInformation("Пользователь {0} успешно зарегистрирован", user.UserName);
 
-                await _SignInManager.SignInAsync(user, false);
+                await _userManager.AddToRoleAsync(user, Role.User);
+
+                _logger.LogInformation("Пользователь {0} наделён ролью {1}", user.UserName, Role.User);
+
+                await _signInManager.SignInAsync(user, false);
+                _logger.LogInformation("Пользователь {0} автоматически вошёл в систему после регистрации",
+                    user.UserName);
+
                 return RedirectToAction("Index", "Home");
             }
 
-            foreach (var error in registration_result.Errors)
+            _logger.LogWarning("Ошибка при регистрации нового пользователя {0}\r\n",
+                model.UserName,
+                string.Join(Environment.NewLine, registrationResult.Errors.Select(error => error.Description)));
+
+            foreach (var error in registrationResult.Errors)
                 ModelState.AddModelError(string.Empty, error.Description);
 
-            return View(Model);
+            return View(model);
         }
 
         #endregion
 
         #region Процесс входа пользователя в систему
 
-        public IActionResult Login(string ReturnUrl) => View(new LoginViewModel { ReturnUrl = ReturnUrl });
+        public IActionResult Login(string returnUrl) => View(new LoginViewModel {ReturnUrl = returnUrl});
 
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginViewModel Model)
+        public async Task<IActionResult> Login(LoginViewModel model)
         {
-            if (!ModelState.IsValid) return View(Model);
+            if (!ModelState.IsValid) return View(model);
 
-            var login_result = await _SignInManager.PasswordSignInAsync(
-                Model.UserName,
-                Model.Password,
-                Model.RememberMe,
+            var loginResult = await _signInManager.PasswordSignInAsync(
+                model.UserName,
+                model.Password,
+                model.RememberMe,
                 false);
 
-            if (login_result.Succeeded)
+            _logger.LogInformation("Попытка входа пользователя {0} в систему", model.UserName);
+
+            if (loginResult.Succeeded)
             {
-                if (Url.IsLocalUrl(Model.ReturnUrl))
-                    return Redirect(Model.ReturnUrl);
+                _logger.LogInformation("Пользователь {0} успешно вошёл в систему", model.UserName);
+
+                if (Url.IsLocalUrl(model.ReturnUrl))
+                    return Redirect(model.ReturnUrl);
                 return RedirectToAction("Index", "Home");
             }
 
+            _logger.LogWarning("Ошибка имени пользователя, или пароля при попытке входа {0}", model.UserName);
+
             ModelState.AddModelError(string.Empty, "Неверное имя пользователя или пароль!");
 
-            return View(Model);
-        } 
+            return View(model);
+        }
 
         #endregion
 
         public async Task<IActionResult> Logout()
         {
-            await _SignInManager.SignOutAsync();
+            var userName = User.Identity.Name;
+            await _signInManager.SignOutAsync();
+            
+            _logger.LogInformation("Пользователь {0} вышел из системы", userName);
+            
             return RedirectToAction("Index", "Home");
         }
 
