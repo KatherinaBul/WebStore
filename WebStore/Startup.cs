@@ -13,6 +13,7 @@ using WebStore.Clients.Services.Orders;
 using WebStore.Clients.Services.Products;
 using WebStore.Clients.Values;
 using WebStore.Domain.Entities.Identity;
+using WebStore.Infrastructure.Middleware;
 using WebStore.Interfaces.Api;
 using WebStore.Interfaces.Services;
 using WebStore.Services.Products.InCookies;
@@ -28,8 +29,8 @@ namespace WebStore
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddIdentity<User, Role>(opt => {  })
-               .AddDefaultTokenProviders();
+            services.AddIdentity<User, Role>(opt => { })
+                .AddDefaultTokenProviders();
 
             #region WebAPI Identity clients stores
 
@@ -42,11 +43,11 @@ namespace WebStore
                 .AddTransient<IUserClaimStore<User>, UsersClient>()
                 .AddTransient<IUserLoginStore<User>, UsersClient>();
             services
-                .AddTransient<IRoleStore<Role>, RolesClient>(); 
+                .AddTransient<IRoleStore<Role>, RolesClient>();
 
             #endregion
 
-            
+
             services.Configure<IdentityOptions>(opt =>
             {
 #if DEBUG
@@ -87,18 +88,19 @@ namespace WebStore
             services.AddScoped<IOrderService, OrdersClient>();
 
             services.AddScoped<IValueService, ValueClient>();
-
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory log)
         {
             log.AddLog4Net();
-            
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 app.UseBrowserLink();
             }
+
+            app.UseMiddleware<ErrorHandlingMiddleware>();
 
             app.UseStaticFiles();
             app.UseDefaultFiles();
@@ -112,10 +114,8 @@ namespace WebStore
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("/greetings", async context =>
-                {
-                    await context.Response.WriteAsync(_Configuration["CustomGreetings"]);
-                });
+                endpoints.MapGet("/greetings",
+                    async context => { await context.Response.WriteAsync(_Configuration["CustomGreetings"]); });
 
                 endpoints.MapControllerRoute(
                     name: "areas",
