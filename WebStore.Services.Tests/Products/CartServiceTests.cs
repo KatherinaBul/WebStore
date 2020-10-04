@@ -15,7 +15,7 @@ namespace WebStore.Services.Tests.Products
     [TestClass]
     public class CartServiceTests
     {
-          private Cart _cart;
+        private Cart _cart;
 
         private Mock<IProductData> _productDataMock;
         private Mock<ICartStore> _cartStoreMock;
@@ -30,15 +30,15 @@ namespace WebStore.Services.Tests.Products
             {
                 Items = new List<CartItem>
                 {
-                    new CartItem { ProductId = 1, Quantity = 1 },
-                    new CartItem { ProductId = 2, Quantity = 3 }
+                    new CartItem {ProductId = 1, Quantity = 1},
+                    new CartItem {ProductId = 2, Quantity = 3}
                 }
             };
 
             _productDataMock = new Mock<IProductData>();
             _productDataMock
-               .Setup(c => c.GetProducts(It.IsAny<ProductFilter>()))
-               .Returns(new List<ProductDto>
+                .Setup(c => c.GetProducts(It.IsAny<ProductFilter>()))
+                .Returns(new List<ProductDto>
                 {
                     new ProductDto
                     {
@@ -47,8 +47,8 @@ namespace WebStore.Services.Tests.Products
                         Price = 1.1m,
                         Order = 0,
                         ImageUrl = "Product1.png",
-                        Brand = new BrandDto { Id = 1, Name = "Brand 1" },
-                        Section = new SectionDto { Id = 1, Name = "Section 1"}
+                        Brand = new BrandDto {Id = 1, Name = "Brand 1"},
+                        Section = new SectionDto {Id = 1, Name = "Section 1"}
                     },
                     new ProductDto
                     {
@@ -57,8 +57,8 @@ namespace WebStore.Services.Tests.Products
                         Price = 2.2m,
                         Order = 0,
                         ImageUrl = "Product2.png",
-                        Brand = new BrandDto { Id = 2, Name = "Brand 2" },
-                        Section = new SectionDto { Id = 2, Name = "Section 2"}
+                        Brand = new BrandDto {Id = 2, Name = "Brand 2"},
+                        Section = new SectionDto {Id = 2, Name = "Section 2"}
                     },
                 });
 
@@ -74,8 +74,8 @@ namespace WebStore.Services.Tests.Products
             {
                 Items = new List<CartItem>
                 {
-                    new CartItem { ProductId = 1, Quantity = 1 },
-                    new CartItem { ProductId = 2, Quantity = 3 },
+                    new CartItem {ProductId = 1, Quantity = 1},
+                    new CartItem {ProductId = 2, Quantity = 3},
                 }
             };
 
@@ -93,8 +93,8 @@ namespace WebStore.Services.Tests.Products
             {
                 Items = new[]
                 {
-                    ( new ProductViewModel { Id = 1, Name = "Product 1", Price = 0.5m }, 1 ),
-                    ( new ProductViewModel { Id = 2, Name = "Product 2", Price = 1.5m }, 3 ),
+                    (new ProductViewModel {Id = 1, Name = "Product 1", Price = 0.5m}, 1),
+                    (new ProductViewModel {Id = 2, Name = "Product 2", Price = 1.5m}, 3),
                 }
             };
 
@@ -172,6 +172,5 @@ namespace WebStore.Services.Tests.Products
             Assert.Equal(4, result.ItemsCount);
             Assert.Equal(1.1m, result.Items.First().Product.Price);
         }
-
     }
 }
