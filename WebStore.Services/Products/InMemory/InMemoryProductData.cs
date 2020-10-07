@@ -12,8 +12,10 @@ namespace WebStore.Services.Products.InMemory
     public class InMemoryProductData : IProductData
     {
         public IEnumerable<SectionDto> GetSections() => TestData.Sections.ToDto();
+        public SectionDto GetSectionById(int id) { throw new System.NotImplementedException(); }
 
         public IEnumerable<BrandDto> GetBrands() => TestData.Brands.ToDto();
+        public BrandDto GetBrandById(int id) { throw new System.NotImplementedException(); }
 
         public IEnumerable<ProductDto> GetProducts(ProductFilter Filter = null)
         {

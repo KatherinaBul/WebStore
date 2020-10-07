@@ -22,12 +22,18 @@ namespace WebStore.ServicesHosting.Controllers
         [HttpGet("sections")]
         public IEnumerable<SectionDto> GetSections() => _productData.GetSections();
 
+        [HttpGet("sections/{id}")]
+        public SectionDto GetSectionById(int id) => _productData.GetSectionById(id);
+
         /// <summary>
         /// Получить список брендов
         /// </summary>
         /// <returns>Список брендов</returns>
         [HttpGet("brands")]
         public IEnumerable<BrandDto> GetBrands() => _productData.GetBrands();
+
+        [HttpGet("brands/{id}")]
+        public BrandDto GetBrandById(int id) => _productData.GetBrandById(id);
 
         /// <summary>
         /// Получить товары в соответствии с фильтром
