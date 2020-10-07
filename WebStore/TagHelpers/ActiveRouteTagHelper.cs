@@ -10,7 +10,9 @@ namespace WebStore.TagHelpers
     [HtmlTargetElement(Attributes = AttributeName)]
     public class ActiveRouteTagHelper : TagHelper
     {
-        public const string AttributeName = "is-active-route";
+        private const string AttributeName = "is-active-route";
+
+        private const string IgnoreAction = "ignore-action";
 
         private IDictionary<string, string> _routeValues;
 
@@ -35,20 +37,21 @@ namespace WebStore.TagHelpers
             output)
         {
             base.Process(context, output);
-            if (ShouldBeActive())
+            
+            var ignoreAction = output.Attributes.ContainsName(IgnoreAction);
+            
+            if (ShouldBeActive(ignoreAction))
             {
                 MakeActive(output);
             }
-
-            output.Attributes.RemoveAll("is-active-route");
+            output.Attributes.RemoveAll(IgnoreAction);
+            output.Attributes.RemoveAll(AttributeName);
         }
 
-        private bool ShouldBeActive()
+        private bool ShouldBeActive(bool ignoreAction)
         {
-            var currentController =
-                ViewContext.RouteData.Values["Controller"].ToString();
-            var currentAction =
-                ViewContext.RouteData.Values["Action"].ToString();
+            var currentController = ViewContext.RouteData.Values["Controller"].ToString();
+            var currentAction = ViewContext.RouteData.Values["Action"].ToString();
             if (!string.IsNullOrWhiteSpace(Controller) &&
                 !string.Equals(Controller, currentController,
                     StringComparison.CurrentCultureIgnoreCase))
@@ -56,7 +59,7 @@ namespace WebStore.TagHelpers
                 return false;
             }
 
-            if (!string.IsNullOrWhiteSpace(Action) && !string.Equals(Action,
+            if (!ignoreAction && !string.IsNullOrWhiteSpace(Action) && !string.Equals(Action,
                     currentAction, StringComparison.CurrentCultureIgnoreCase))
             {
                 return false;
@@ -65,8 +68,7 @@ namespace WebStore.TagHelpers
             foreach (var routeValue in RouteValues)
             {
                 if (!ViewContext.RouteData.Values.ContainsKey(routeValue.Key) ||
-                    ViewContext.RouteData.Values[routeValue.Key].ToString() !=
-                    routeValue.Value)
+                    ViewContext.RouteData.Values[routeValue.Key].ToString() != routeValue.Value)
                 {
                     return false;
                 }
