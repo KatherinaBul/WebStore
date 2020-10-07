@@ -15,10 +15,13 @@
                 <div class="product-image-wrapper">
                     <div class="single-products">
                         <div class="productinfo text-center">
-                            <img src="~/images/shop/@product.ImageUrl" alt="@product.Name" />
+                            <img src="~/images/shop/@product.ImageUrl" alt="@product.Name"/>
                             <h2>@product.Price.ToString("C")</h2>
                             <p>
-                                <a asp-controller="Catalog" asp-action="Details" asp-route-id="@product.Id">
+                                <a asp-controller="Catalog" asp-action="Details" asp-route-id="@product.Id"
+                                   asp-route-SectionId="@Context.Request.Query["SectionId"]"
+                                   asp-route-BrandId="@Context.Request.Query["BrandId"]">
+
                                     @product.Name
                                 </a>
                             </p>
@@ -30,7 +33,9 @@
                             <div class="overlay-content">
                                 <h2>@product.Price.ToString("C")</h2>
                                 <p>
-                                    <a asp-controller="Catalog" asp-action="Details" asp-route-id="@product.Id">
+                                    <a asp-controller="Catalog" asp-action="Details" asp-route-id="@product.Id"
+                                       asp-route-SectionId="@Context.Request.Query["SectionId"]"
+                                       asp-route-BrandId="@Context.Request.Query["BrandId"]">
                                         @product.Name
                                     </a>
                                 </p>
@@ -42,8 +47,12 @@
                     </div>
                     <div class="choose">
                         <ul class="nav nav-pills nav-justified">
-                            <li><a href="#"><i class="fa fa-plus-square"></i>Добавить в список желаний</a></li>
-                            <li><a href="#"><i class="fa fa-plus-square"></i>Добавить к сравнению</a></li>
+                            <li>
+                                <a href="#"><i class="fa fa-plus-square"></i>Добавить в список желаний</a>
+                            </li>
+                            <li>
+                                <a href="#"><i class="fa fa-plus-square"></i>Добавить к сравнению</a>
+                            </li>
                         </ul>
                     </div>
                 </div>
