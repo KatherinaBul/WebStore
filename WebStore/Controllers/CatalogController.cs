@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using WebStore.Domain;
 using WebStore.Domain.ViewModels;
 using WebStore.Interfaces.Services;
@@ -9,31 +10,42 @@ namespace WebStore.Controllers
 {
     public class CatalogController : Controller
     {
-        private readonly IProductData _ProductData;
+        private readonly IProductData _productData;
+        private readonly IConfiguration _configuration;
 
-        public CatalogController(IProductData ProductData) => _ProductData = ProductData;
-
-        public IActionResult Shop(int? BrandId, int? SectionId)
+        public CatalogController(IProductData productData, IConfiguration configuration)
         {
+            _productData = productData;
+            _configuration = configuration;
+        }
+
+        public IActionResult Shop(int? brandId, int? sectionId, int page = 1)
+        {
+            var pageSize = int.TryParse(_configuration["PageSize"], out var size)
+                ? size
+                : (int?) null;
+
             var filter = new ProductFilter
             {
-                BrandId = BrandId,
-                SectionId = SectionId
+                BrandId = brandId,
+                SectionId = sectionId,
+                Page = page,
+                PageSize = pageSize
             };
 
-            var products = _ProductData.GetProducts(filter);
+            var products = _productData.GetProducts(filter);
 
             return View(new CatalogViewModel
             {
-                SectionId = SectionId,
-                BrandId = BrandId,
+                SectionId = sectionId,
+                BrandId = brandId,
                 Products = products.FromDto().ToView().OrderBy(p => p.Order)
             });
         }
 
         public IActionResult Details(int id)
         {
-            var product = _ProductData.GetProductById(id);
+            var product = _productData.GetProductById(id);
 
             if (product is null)
                 return NotFound();
