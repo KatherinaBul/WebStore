@@ -4,7 +4,6 @@ using Microsoft.Extensions.Configuration;
 using WebStore.Clients.Base;
 using WebStore.Domain;
 using WebStore.Domain.Dto;
-using WebStore.Domain.Entities;
 using WebStore.Interfaces.Services;
 
 namespace WebStore.Clients.Services.Products
@@ -21,10 +20,10 @@ namespace WebStore.Clients.Services.Products
         public IEnumerable<BrandDto> GetBrands() => Get<IEnumerable<BrandDto>>($"{ServiceAddress}/brands");
         public BrandDto GetBrandById(int id) => Get<BrandDto>($"{ServiceAddress}/brands/{id}");
 
-        public IEnumerable<ProductDto> GetProducts(ProductFilter Filter = null) =>
+        public PageProductsDto GetProducts(ProductFilter Filter = null) =>
             Post(ServiceAddress, Filter ?? new ProductFilter())
                 .Content
-                .ReadAsAsync<IEnumerable<ProductDto>>()
+                .ReadAsAsync<PageProductsDto>()
                 .Result;
 
         public ProductDto GetProductById(int id) => Get<ProductDto>($"{ServiceAddress}/{id}");

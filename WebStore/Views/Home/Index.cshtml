@@ -4,6 +4,7 @@
 @{
     var products = ProductData
         .GetProducts()
+        .Products
         .Take(6)
         .FromDto()
         .ToView()

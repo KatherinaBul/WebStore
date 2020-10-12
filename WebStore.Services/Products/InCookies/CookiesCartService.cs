@@ -11,44 +11,45 @@ namespace WebStore.Services.Products.InCookies
 {
     public class CookiesCartService : ICartService
     {
-        private readonly IProductData _ProductData;
-        private readonly IHttpContextAccessor _HttpContextAccessor;
-        private readonly string _CartName;
+        private readonly IProductData _productData;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly string _cartName;
 
         private Cart Cart
         {
             get
             {
-                var context = _HttpContextAccessor.HttpContext;
+                var context = _httpContextAccessor.HttpContext;
                 var cookies = context.Response.Cookies;
-                var cart_cookies = context.Request.Cookies[_CartName];
-                if (cart_cookies is null)
+                var cartCookies = context.Request.Cookies[_cartName];
+                if (cartCookies is null)
                 {
                     var cart = new Cart();
-                    cookies.Append(_CartName, JsonConvert.SerializeObject(cart));
+                    cookies.Append(_cartName, JsonConvert.SerializeObject(cart));
                     return cart;
                 }
 
-                ReplaceCookies(cookies, cart_cookies);
-                return JsonConvert.DeserializeObject<Cart>(cart_cookies);
+                ReplaceCookies(cookies, cartCookies);
+                return JsonConvert.DeserializeObject<Cart>(cartCookies);
             }
-            set => ReplaceCookies(_HttpContextAccessor.HttpContext.Response.Cookies, JsonConvert.SerializeObject(value));
+            set => ReplaceCookies(_httpContextAccessor.HttpContext.Response.Cookies,
+                JsonConvert.SerializeObject(value));
         }
 
         private void ReplaceCookies(IResponseCookies cookies, string cookie)
         {
-            cookies.Delete(_CartName);
-            cookies.Append(_CartName, cookie);
+            cookies.Delete(_cartName);
+            cookies.Append(_cartName, cookie);
         }
 
-        public CookiesCartService(IProductData ProductData, IHttpContextAccessor HttpContextAccessor)
+        public CookiesCartService(IProductData productData, IHttpContextAccessor httpContextAccessor)
         {
-            _ProductData = ProductData;
-            _HttpContextAccessor = HttpContextAccessor;
+            _productData = productData;
+            _httpContextAccessor = httpContextAccessor;
 
-            var user = HttpContextAccessor.HttpContext.User;
-            var user_name = user.Identity.IsAuthenticated ? $"[{user.Identity.Name}]" : null;
-            _CartName = $"WebStore.Cart{user_name}";
+            var user = httpContextAccessor.HttpContext.User;
+            var userName = user.Identity.IsAuthenticated ? $"[{user.Identity.Name}]" : null;
+            _cartName = $"WebStore.Cart{userName}";
         }
 
         public void AddToCart(int id)
@@ -68,7 +69,7 @@ namespace WebStore.Services.Products.InCookies
         {
             var cart = Cart;
             var item = cart.Items.FirstOrDefault(i => i.ProductId == id);
-            if(item is null) return;
+            if (item is null) return;
 
             if (item.Quantity > 0)
                 item.Quantity--;
@@ -101,16 +102,16 @@ namespace WebStore.Services.Products.InCookies
 
         public CartViewModel TransformFromCart()
         {
-            var products = _ProductData.GetProducts(new ProductFilter
+            var products = _productData.GetProducts(new ProductFilter
             {
                 Ids = Cart.Items.Select(item => item.ProductId).ToArray()
             });
 
-            var products_view_models = products.FromDto().ToView().ToDictionary(p => p.Id);
+            var productsViewModels = products.Products.FromDto().ToView().ToDictionary(p => p.Id);
 
             return new CartViewModel
             {
-                Items = Cart.Items.Select(item => (products_view_models[item.ProductId], item.Quantity))
+                Items = Cart.Items.Select(item => (productsViewModels[item.ProductId], item.Quantity))
             };
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using WebStore.Controllers;
@@ -14,7 +15,7 @@ namespace WebStore.Tests.Controllers
     [TestClass]
     public class CatalogControllerTests
     {
-          [TestMethod]
+        [TestMethod]
         public void Details_Returns_with_Correct_View()
         {
             // A - A - A = Arrange - Act - Assert
@@ -29,27 +30,32 @@ namespace WebStore.Tests.Controllers
 
             var productDataMock = new Mock<IProductData>();
             productDataMock
-               .Setup(p => p.GetProductById(It.IsAny<int>()))
-               .Returns<int>(id => new ProductDto
+                .Setup(p => p.GetProductById(It.IsAny<int>()))
+                .Returns<int>(id => new ProductDto
                 {
-                   Id = id,
-                   Name = $"Product id {id}",
-                   ImageUrl = $"img{id}.png",
-                   Order = 1,
-                   Price = expectedPrice,
-                   Brand = new BrandDto
-                   {
-                       Id = 1,
-                       Name = $"Brand of product {id}"
-                   },
-                   Section = new SectionDto
-                   {
-                       Id = 1,
-                       Name = $"Section of product {id}"
-                   }
+                    Id = id,
+                    Name = $"Product id {id}",
+                    ImageUrl = $"img{id}.png",
+                    Order = 1,
+                    Price = expectedPrice,
+                    Brand = new BrandDto
+                    {
+                        Id = 1,
+                        Name = $"Brand of product {id}"
+                    },
+                    Section = new SectionDto
+                    {
+                        Id = 1,
+                        Name = $"Section of product {id}"
+                    }
                 });
 
-            var controller = new CatalogController(productDataMock.Object);
+            var configurationMock = new Mock<IConfiguration>();
+            configurationMock
+                .Setup(cfg => cfg[It.IsAny<string>()])
+                .Returns("3");
+
+            var controller = new CatalogController(productDataMock.Object, configurationMock.Object);
 
             #endregion
 
@@ -117,13 +123,22 @@ namespace WebStore.Tests.Controllers
 
             var productDataMock = new Mock<IProductData>();
             productDataMock
-               .Setup(p => p.GetProducts(It.IsAny<ProductFilter>()))
-               .Returns(products);
+                .Setup(p => p.GetProducts(It.IsAny<ProductFilter>()))
+                .Returns(new PageProductsDto
+                {
+                    Products = products,
+                    TotalCount = products.Length
+                });
 
             const int expectedSectionId = 1;
             const int expectedBrandId = 5;
 
-            var controller = new CatalogController(productDataMock.Object);
+            var configurationMock = new Mock<IConfiguration>();
+            configurationMock
+                .Setup(cfg => cfg[It.IsAny<string>()])
+                .Returns("3");
+
+            var controller = new CatalogController(productDataMock.Object, configurationMock.Object);
 
             var result = controller.Shop(expectedBrandId, expectedSectionId);
 

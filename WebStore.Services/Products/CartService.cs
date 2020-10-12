@@ -74,6 +74,7 @@ namespace WebStore.Services.Products
             });
 
             var productsViewModels = products
+                .Products
                 .FromDto()
                 .ToView()
                 .ToDictionary(p => p.Id);
