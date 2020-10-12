@@ -6,7 +6,7 @@
 <section>
     <div class="container">
         <vc:bread-crumbs/>
-        
+
         <div class="row">
             <div class="col-sm-3">
                 <partial name="Partial/_LeftSideBar"/>
@@ -25,19 +25,37 @@
                             <!-- Wrapper for slides -->
                             <div class="carousel-inner">
                                 <div class="item active">
-                                    <a href=""><img src="~/images/product-details/similar1.jpg" alt=""></a>
-                                    <a href=""><img src="~/images/product-details/similar2.jpg" alt=""></a>
-                                    <a href=""><img src="~/images/product-details/similar3.jpg" alt=""></a>
+                                    <a href="">
+                                        <img src="~/images/product-details/similar1.jpg" alt="">
+                                    </a>
+                                    <a href="">
+                                        <img src="~/images/product-details/similar2.jpg" alt="">
+                                    </a>
+                                    <a href="">
+                                        <img src="~/images/product-details/similar3.jpg" alt="">
+                                    </a>
                                 </div>
                                 <div class="item">
-                                    <a href=""><img src="~/images/product-details/similar1.jpg" alt=""></a>
-                                    <a href=""><img src="~/images/product-details/similar2.jpg" alt=""></a>
-                                    <a href=""><img src="~/images/product-details/similar3.jpg" alt=""></a>
+                                    <a href="">
+                                        <img src="~/images/product-details/similar1.jpg" alt="">
+                                    </a>
+                                    <a href="">
+                                        <img src="~/images/product-details/similar2.jpg" alt="">
+                                    </a>
+                                    <a href="">
+                                        <img src="~/images/product-details/similar3.jpg" alt="">
+                                    </a>
                                 </div>
                                 <div class="item">
-                                    <a href=""><img src="~/images/product-details/similar1.jpg" alt=""></a>
-                                    <a href=""><img src="~/images/product-details/similar2.jpg" alt=""></a>
-                                    <a href=""><img src="~/images/product-details/similar3.jpg" alt=""></a>
+                                    <a href="">
+                                        <img src="~/images/product-details/similar1.jpg" alt="">
+                                    </a>
+                                    <a href="">
+                                        <img src="~/images/product-details/similar2.jpg" alt="">
+                                    </a>
+                                    <a href="">
+                                        <img src="~/images/product-details/similar3.jpg" alt="">
+                                    </a>
                                 </div>
 
                             </div>
@@ -63,15 +81,21 @@
                                 <span>@Model.Price.ToString("C")</span>
                                 <label>Количество:</label>
                                 <input type="text" value="3"/>
-                                <button type="button" class="btn btn-default cart">
+                                <a asp-controller="Cart" asp-action="AddToCart"
+                                   asp-route-id="@Model.Id"
+                                   data-id="@Model.Id"
+                                   type="button"
+                                   class="btn btn-default add-to-cart">
                                     <i class="fa fa-shopping-cart"></i>
                                     В корзину
-                                </button>
+                                </a>
                             </span>
                             <p><b>Доступность:</b> In Stock</p>
                             <p><b>Состояние:</b> новое</p>
                             <p><b>Бренд:</b> @Model.</p>
-                            <a href=""><img src="~/images/product-details/share.png" class="share img-responsive" alt=""/></a>
+                            <a href="">
+                                <img src="~/images/product-details/share.png" class="share img-responsive" alt=""/>
+                            </a>
                         </div><!--/product-information-->
                     </div>
                 </div><!--/product-details-->

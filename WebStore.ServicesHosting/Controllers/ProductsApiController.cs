@@ -41,7 +41,7 @@ namespace WebStore.ServicesHosting.Controllers
         /// <param name="filter"></param>
         /// <returns>Список товаров</returns>
         [HttpPost]
-        public IEnumerable<ProductDto> GetProducts(ProductFilter filter = null) => _productData.GetProducts(filter);
+        public PageProductsDto GetProducts(ProductFilter filter = null) => _productData.GetProducts(filter);
 
         /// <summary>
         /// Получить информацию о товаре по его идентифиакатору

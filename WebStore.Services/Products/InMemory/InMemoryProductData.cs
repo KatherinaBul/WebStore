@@ -17,7 +17,7 @@ namespace WebStore.Services.Products.InMemory
         public IEnumerable<BrandDto> GetBrands() => TestData.Brands.ToDto();
         public BrandDto GetBrandById(int id) { throw new System.NotImplementedException(); }
 
-        public IEnumerable<ProductDto> GetProducts(ProductFilter Filter = null)
+        public PageProductsDto GetProducts(ProductFilter Filter = null)
         {
             var query = TestData.Products;
 
@@ -27,7 +27,15 @@ namespace WebStore.Services.Products.InMemory
             if (Filter?.BrandId != null)
                 query = query.Where(product => product.BrandId == Filter.BrandId);
 
-            return query.ToDto();
+            var totalCount = query.Count();
+
+            if (Filter?.PageSize > 0)
+                query = query
+                    .Skip((Filter.Page - 1) * (int) Filter.PageSize)
+                    .Take((int) Filter.PageSize);
+
+
+            return new PageProductsDto {Products = query.AsEnumerable().ToDto(), TotalCount = totalCount};
         }
 
         public ProductDto GetProductById(int id) => TestData.Products.FirstOrDefault(p => p.Id == id).ToDto();
