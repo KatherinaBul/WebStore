@@ -26,6 +26,12 @@ namespace WebStore.Controllers
         #region Процесс регистрации нового пользвоателя
 
         public IActionResult Register() => View(new RegisterUserViewModel());
+        
+        public async Task<IActionResult> IsNameFree(string userName)
+        {
+            var user = await _userManager.FindByNameAsync(userName);
+            return Json(user is null ? "true" : "Пользователь с таким именем уже существует");
+        }
 
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterUserViewModel model)
