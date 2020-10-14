@@ -1,0 +1,42 @@
+﻿@{
+    ViewData["Title"] = "SignalRTest";
+}
+
+<div class="container">
+    <h3>SignalR test chat</h3>
+
+    <div>
+        <div id="input-form">
+            <div>
+                <label>Ваше имя:</label>
+                <input type="text" id="userName"/>
+            </div>
+            <div>
+                <label>Сообщение:</label>
+                <input type="text" id="message"/>
+                <input type="button" class="btn btn-default" id="send-button" value="Отправить"/>
+            </div>
+        </div>
+
+        <ul id="information-block" style="max-height: 200px; overflow-y: scroll;"></ul>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="~/lib/aspnet-signalr/signalr.min.js"></script>
+
+    <script>
+        const hub_url = "/info";
+
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl(hub_url)
+            .build();
+
+        connection.on("MessageFromClient", data => $("#information-block").prepend($("<li></li>").html(data)));
+
+        $("#send-button").click(e => connection.invoke("SendMessage", `${$("#userName").val()}: ${$("#message").val()}`));
+
+        connection.start();
+    </script>
+}

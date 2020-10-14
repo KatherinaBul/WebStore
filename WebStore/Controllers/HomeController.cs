@@ -31,5 +31,8 @@ namespace WebStore.Controllers
                     return Content($"Error {code}");
             }
         }
+        
+        public IActionResult SignalRTest() => View();
+        
     }
 }

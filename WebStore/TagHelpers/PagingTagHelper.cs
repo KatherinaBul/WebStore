@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.Routing;
@@ -9,12 +10,9 @@ using WebStore.Domain.ViewModels;
 
 namespace WebStore.TagHelpers
 {
-    public class PagingTagHelper:TagHelper
+    public class PagingTagHelper : TagHelper
     {
-        private readonly IUrlHelperFactory _urlHelperFactory;
-
-        [ViewContext, HtmlAttributeNotBound]
-        public ViewContext ViewContext { get; set; }
+        [ViewContext, HtmlAttributeNotBound] public ViewContext ViewContext { get; set; }
 
         public PageViewModel PageModel { get; set; }
 
@@ -24,31 +22,33 @@ namespace WebStore.TagHelpers
         public Dictionary<string, object> PageUrlValues { get; set; }
             = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
-        public PagingTagHelper(IUrlHelperFactory urlHelperFactory) => _urlHelperFactory = urlHelperFactory;
-
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             var ul = new TagBuilder("ul");
             ul.AddCssClass("pagination");
 
-            var urlHelper = _urlHelperFactory.GetUrlHelper(ViewContext);
             for (int i = 1, totalPages = PageModel.TotalPages; i < totalPages; i++)
-                ul.InnerHtml.AppendHtml(CreateItem(i, urlHelper));
+                ul.InnerHtml.AppendHtml(CreateItem(i));
 
             output.Content.AppendHtml(ul);
         }
 
-        private TagBuilder CreateItem(int pageNumber, IUrlHelper url)
+        private TagBuilder CreateItem(int pageNumber)
         {
             var li = new TagBuilder("li");
             var a = new TagBuilder("a");
 
-            if(pageNumber == PageModel.PageNumber)
+            if (pageNumber == PageModel.PageNumber)
+            {
+                a.MergeAttribute("data-page", PageModel.PageNumber.ToString());
                 li.AddCssClass("active");
+            }
             else
             {
                 PageUrlValues["page"] = pageNumber;
-                a.Attributes["href"] = url.Action(PageAction, PageUrlValues);
+                a.Attributes["href"] = "#";
+                foreach (var (key, value) in PageUrlValues.Where(v => v.Value != null))
+                    a.MergeAttribute($"data-{key}", value.ToString());
             }
 
             a.InnerHtml.AppendHtml(pageNumber.ToString());
